@@ -8,7 +8,7 @@ public class Member {
     private String email;
     private String first_name;
     private String last_name;
-    private int latest_dash;
+    public int latest_dash;
 
     public Member(Connection conn, Scanner sc) {
         this.conn = conn;
@@ -359,7 +359,8 @@ public class Member {
             }
         }
 
-        this.latest_dash += 1;
+        this.latest_dash++;
+        System.out.println(latest_dash);
 
         System.out.print(   "|                       [ heart rate ]                      |\n" +
                             "|___________________________________________________________|\n" +
