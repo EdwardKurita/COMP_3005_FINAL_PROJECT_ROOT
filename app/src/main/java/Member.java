@@ -415,7 +415,7 @@ public class Member {
                             "|                   Available PT slots                      |\n" +
                             "|___________________________________________________________|\n");
 
-        String available_slots = "SELECT first_name, last_name, win_date, start_time, end_time FROM trainer t RIGHT JOIN availability_window a ON t.trainer_id = a.trainer_id";
+        String available_slots = "SELECT first_name, last_name, trainer_id, win_date, start_time, end_time FROM trainer t RIGHT JOIN availability_window a ON t.trainer_id = a.trainer_id";
         try (PreparedStatement stmt1 = conn.prepareStatement(available_slots, Statement.RETURN_GENERATED_KEYS)) {
             ResultSet rs = stmt1.executeQuery();
 
@@ -425,8 +425,8 @@ public class Member {
             }
 
             while (rs.next()) {
-                System.out.print(   "| " + rs.getString(1) + " " + rs.getString(2) + "\n" +
-                                    "| " + rs.getDate(3) + " - " + rs.getTime(4) + " to " + rs.getTime(5) + "\n" +
+                System.out.print(   "| " + rs.getString(1) + " " + rs.getString(2) + " - id: " + rs.getInt(3) + "\n" +
+                                    "| " + rs.getDate(4) + " - " + rs.getTime(5) + " to " + rs.getTime(6) + "\n" +
                                     "|___________________________________________________________|\n");
             }
 
@@ -436,6 +436,49 @@ public class Member {
         }
 
         // add pt session scheduling
+        boolean loop = true;
+        String input;
 
+        System.out.print(   "|                  OPTIONS (case sensitive)                 |\n" +
+                            "|                   [ select slot | exit ]                  |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        while (loop) {
+            input = sc.nextLine();
+            switch (input) {
+                case "exit":
+                    return;
+                case "select slot":
+                    loop = false;
+                    break;
+                default:
+                    System.out.print("| Invalid input. Please try again.\n");
+                    break;
+            }
+        }
+        System.out.print(   "|___________________________________________________________|\n" +
+                            "|                   Enter desired trainer id                |\n" +
+                            "| : ");
+        int trainer_id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|___________________________________________________________|\n" +
+                            "|                     Enter PT session date                 |\n" +
+                            "| : ");
+        String session_date = sc.nextLine();
+
+        System.out.print(   "|___________________________________________________________|\n" +
+                            "|                  Enter PT session start time              |\n" +
+                            "| : ");
+        String start_time = sc.nextLine();
+
+        System.out.print(   "|___________________________________________________________|\n" +
+                            "|                    Enter PT session end time              |\n" +
+                            "| : ");
+        String end_time = sc.nextLine();
+
+        
+        try (PreparedStatement stmt = conn.prepareStatement())
     }
 }
