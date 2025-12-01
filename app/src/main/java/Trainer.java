@@ -1,12 +1,13 @@
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
+import java.sql.*;
+import java.util.Scanner;
 
 public class Trainer {
     public Connection conn;
+    private final Scanner sc;
 
-    public Trainer(Connection conn) {
+    public Trainer(Connection conn, Scanner sc) {
         this.conn = conn;
+        this.sc = sc;
     }
 
     // default trainer loop (logout to exit)

@@ -1,12 +1,13 @@
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
+import java.sql.*;
+import java.util.Scanner;
 
 public class Admin {
     public Connection conn;
+    private final Scanner sc;
 
-    public Admin(Connection conn) {
+    public Admin(Connection conn, Scanner sc) {
         this.conn = conn;
+        this.sc = sc;
     }
 
     // default admin loop logout to exit

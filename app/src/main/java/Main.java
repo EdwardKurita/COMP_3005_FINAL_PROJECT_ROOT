@@ -1,12 +1,9 @@
-import java.awt.*;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
     // main main loop
-    public static void main() {
+    public static void main(String[] args) {
         Connection conn = getConnection();
 
         if (conn != null) {
@@ -36,58 +33,59 @@ public class Main {
 
     // login function (login as member/trainer/admin or register) also creates a new admin/member/trainer class on switch
     public static void login(Connection conn) {
-        Scanner login_reroute = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         boolean loop = true;
-        String login = "";
+        String input = "";
         // These three get created early so that no matter which one gets selected in login, its easy to pivot.
-        Member member = new Member(conn);
-        Trainer trainer = new Trainer(conn);
-        Admin admin = new Admin(conn);
+        Member member = new Member(conn, sc);
+        Trainer trainer = new Trainer(conn, sc);
+        Admin admin = new Admin(conn, sc);
 
-        System.out.print(   ",___________________________________________________________,\n" +
-                            "|             Welcome to Health and Fitness tool!           |\n" +
-                            "|                                                           |\n" +
-                            "|                      Login / register                     |\n" +
-                            "|                  OPTIONS (case sensitive)                 |\n" +
-                            "|       [ register | member | trainer | admin | exit ]      |\n" +
-                            "|___________________________________________________________|\n" +
-                            "| : ");
+        while (loop) {
+            System.out.print(   ",___________________________________________________________,\n" +
+                                "|             Welcome to Health and Fitness tool!           |\n" +
+                                "|                                                           |\n" +
+                                "|                      Login / register                     |\n" +
+                                "|                  OPTIONS (case sensitive)                 |\n" +
+                                "|       [ register | member | trainer | admin | exit ]      |\n" +
+                                "|___________________________________________________________|\n" +
+                                "| : ");
 
-        // infinite loop to handle random input (this might be the only error handling lolol)
-        while (loop){
-            login = login_reroute.nextLine();
+            boolean inner_loop = true;
+            // infinite loop to handle random input (this might be the only error handling lolol)
+            while (inner_loop) {
+                input = sc.nextLine();
 
-            switch (login) {
-                case "register","member","trainer","admin", "exit":
+                switch (input) {
+                    case "register", "member", "trainer", "admin", "exit":
+                        inner_loop = false;
+                        break;
+                    default:
+                        System.out.print("| Invalid input. Please try again\n| : ");
+                        break;
+                }
+            }
+            // switch to individual login sections for whatever class depending on what the user selects.
+            switch (input) {
+                case "register":
+                    member.register();
+                    break;
+                case "member":
+                    member.login();
+                    break;
+                case "trainer":
+                    trainer.login();
+                    break;
+                case "admin":
+                    admin.login();
+                    break;
+                case "exit":
                     loop = false;
                     break;
-                default:
-                    System.out.print("| Invalid input. Please try again\n| : ");
+                default: // this should never hit, but its here just in case
+                    System.out.println("Login Issue. Exiting");
                     break;
             }
-        }
-
-        login_reroute.close();
-
-        // switch to individual login sections for whatever class depending on what the user selects.
-        switch (login) {
-            case "register":
-                member.register();
-                break;
-            case "member":
-                member.login();
-                break;
-            case "trainer":
-                trainer.login();
-                break;
-            case "admin":
-                admin.login();
-                break;
-            case "exit":
-                break;
-            default: // this should never hit, but its here just in case
-                System.out.println("Login Issue. Exiting");
-                break;
         }
     }
 }
