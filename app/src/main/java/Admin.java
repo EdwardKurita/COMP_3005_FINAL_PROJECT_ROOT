@@ -43,7 +43,7 @@ public class Admin {
                     book_room();
                     break;
                 case "equipment":
-                    //update_equipment();
+                    update_equipment();
                     break;
                 case "exit":
                     return;
@@ -210,6 +210,85 @@ public class Admin {
     }
 
     public void update_equipment(){
+        boolean loop = true;
+        String input = "";
 
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|               Welcome to the equipment logs!              |\n" +
+                            "|___________________________________________________________|\n");
+
+        String fetch_logs = "SELECT * FROM equipment_logs";
+        try (PreparedStatement stmt1 = conn.prepareStatement(fetch_logs)){
+            ResultSet rs = stmt1.executeQuery();
+            if (!rs.isBeforeFirst()) {
+                System.out.println("| There are currently no logs.");
+            }
+            while (rs.next()){
+                System.out.print(   "| Issue # " + rs.getInt(1) + " | " + rs.getString(4) + " | " + rs.getString(3) + "\n" +
+                                    "| Description: " + rs.getString(2) + "\n" +
+                                    "|___________________________________________________________|\n");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.print(   "|                  OPTIONS (case sensitive)                 |\n" +
+                            "|                   [ new | fixed | exit ]                  |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        while (loop) {
+            input = sc.nextLine();
+            switch (input) {
+                case "new", "fixed", "exit":
+                    loop = false;
+                    break;
+                default:
+                    System.out.print("| Invalid input. Please try again.\n");
+                    break;
+            }
+        }
+
+        if (input.equals("exit")) {
+            return;
+        }
+
+        if (input.equals("new")) {
+            System.out.print(   "|                       [ equipment ]                       |\n" +
+                                "|___________________________________________________________|\n" +
+                                "| : ");
+            String equipment = sc.nextLine();
+
+            System.out.print(   "|                      [ description ]                      |\n" +
+                                "|___________________________________________________________|\n" +
+                                "| : ");
+            String description = sc.nextLine();
+
+            String new_log = "INSERT INTO equipment_logs (descript, stat, equipment) VALUES (?, ?, ?)";
+            try (PreparedStatement stmt2 = conn.prepareStatement(new_log)){
+                stmt2.setString(1, description);
+                stmt2.setString(2, "open");
+                stmt2.setString(3, equipment);
+                stmt2.executeUpdate();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            System.out.print(   "|                        [ Issue # ]                        |\n" +
+                                "|___________________________________________________________|\n" +
+                                "| : ");
+            int issue_id = sc.nextInt();
+            sc.nextLine();
+
+            String update_log = "UPDATE equipment_logs SET stat = ? WHERE issue_id = ?";
+            try (PreparedStatement stmt3 = conn.prepareStatement(update_log)) {
+                stmt3.setString(1, "closed");
+                stmt3.setInt(2, issue_id);
+                stmt3.executeUpdate();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
