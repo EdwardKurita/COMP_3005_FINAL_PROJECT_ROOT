@@ -10,10 +10,23 @@ public class Admin {
     }
 
     // default admin loop logout to exit
+    public void admin_loop(){
+
+    }
 
     // admin login
+    public void login(){
+
+        admin_loop();
+    }
 
     // room booking
+    public void book_room(){
+
+    }
 
     // equipment management
+    public void update_equipment(){
+
+    }
 }

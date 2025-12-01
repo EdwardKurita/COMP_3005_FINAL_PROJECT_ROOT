@@ -72,18 +72,16 @@ public class Main {
         // switch to individual login sections for whatever class depending on what the user selects.
         switch (login) {
             case "register":
-
+                member.register();
                 break;
             case "member":
-
+                member.login();
                 break;
             case "trainer":
-
-
+                trainer.login();
                 break;
             case "admin":
-
-
+                admin.login();
                 break;
             case "exit":
                 break;
