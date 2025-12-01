@@ -10,7 +10,6 @@ public class Main {
         Connection conn = getConnection();
 
         if (conn != null) {
-            System.out.print("\033[H\033[2J");
             login(conn);
         }
 
@@ -50,7 +49,7 @@ public class Main {
                             "|                                                           |\n" +
                             "|                      Login / register                     |\n" +
                             "|                  OPTIONS (case sensitive)                 |\n" +
-                            "|          [ register | member | trainer | admin ]          |\n" +
+                            "|       [ register | member | trainer | admin | exit ]      |\n" +
                             "|___________________________________________________________|\n" +
                             "| : ");
 
@@ -59,7 +58,7 @@ public class Main {
             login = login_reroute.nextLine();
 
             switch (login) {
-                case "register","member","trainer","admin":
+                case "register","member","trainer","admin", "exit":
                     loop = false;
                     break;
                 default:
@@ -85,6 +84,8 @@ public class Main {
             case "admin":
 
 
+                break;
+            case "exit":
                 break;
             default: // this should never hit, but its here just in case
                 System.out.println("Login Issue. Exiting");
