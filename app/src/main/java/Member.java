@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 public class Member {
     public Connection conn;
 
+    public Member(Connection conn) {
+        this.conn = conn;
+    }
+
     // default member loop
 
     // login as member (logout to exit)

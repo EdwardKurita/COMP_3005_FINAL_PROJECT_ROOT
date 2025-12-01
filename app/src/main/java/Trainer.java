@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 public class Trainer {
     public Connection conn;
 
+    public Trainer(Connection conn) {
+        this.conn = conn;
+    }
+
     // default trainer loop (logout to exit)
 
     // Trainer login (called immediately)
