@@ -7,4 +7,8 @@ After the database is setup, run the DDL.sql file and DML.sql in the query tool 
 
 Pull the app directory and open with intellij to run the program. No further setup is required. 
 
-Also sorry for code spaghetti I thought this was due on the 6th so I wrote it all today. Check the commits :_) 
+Also sorry for code spaghetti I thought this was due on the 6th so I wrote it all today. Check the commits :_)
+
+Links (also in report.pdf)
+[Video][https://youtu.be/wHyXB_WdvjE]
+[Github][https://github.com/EdwardKurita/COMP_3005_FINAL_PROJECT_ROOT.git]
