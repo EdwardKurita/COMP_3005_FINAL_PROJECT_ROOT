@@ -58,7 +58,6 @@ public class Member {
                     System.out.println("| Input handling issue.");
                     break;
             }
-
         }
     }
 
@@ -94,27 +93,26 @@ public class Member {
 
         member_loop();
     }
+
     public boolean validate_email(String email){
         try (PreparedStatement stmt = conn.prepareStatement("SELECT member_id, first_name, last_name FROM member WHERE email = ?")) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
-           if(rs.next()){
+            if(rs.next()){
                 this.member_id = rs.getInt(1);
                 this.first_name = rs.getString(2);
                 this.last_name = rs.getString(3);
                 rs.close();
-                stmt.close();
 
                 this.email = email;
 
                 return true;
-           }
+            }
 
-           rs.close();
-           stmt.close();
+            rs.close();
 
-           return false;
+            return false;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -222,8 +220,8 @@ public class Member {
             throw new RuntimeException(e);
         }
 
-        String insertfitness = "INSERT INTO member_fitness (member_id, entry_num, heart_rate, gender, weight_val, body_fat)" +
-                             "VALUES (?, ?, ?, ?, ?, ?)";
+        String insertfitness =  "INSERT INTO member_fitness (member_id, entry_num, heart_rate, gender, weight_val, body_fat)" +
+                                "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt2 = conn.prepareStatement(insertfitness)) {
             stmt2.setInt(1, member_id);
             stmt2.setInt(2, 1);
@@ -340,8 +338,7 @@ public class Member {
             throw new RuntimeException(e);
         }
 
-        System.out.print(
-                            "|___________________________________________________________|\n" +
+        System.out.print(   "|___________________________________________________________|\n" +
                             "|                  OPTIONS (case sensitive)                 |\n" +
                             "|                     [ update | exit ]                     |\n" +
                             "|___________________________________________________________|\n" +
@@ -361,6 +358,8 @@ public class Member {
                     break;
             }
         }
+
+        this.latest_dash += 1;
 
         System.out.print(   "|                       [ heart rate ]                      |\n" +
                             "|___________________________________________________________|\n" +
@@ -393,7 +392,7 @@ public class Member {
         String update_info = "INSERT INTO member_fitness (member_id, entry_num, heart_rate, gender, weight_val, body_fat, goal) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt2 = conn.prepareStatement(update_info)) {
             stmt2.setInt(1, member_id);
-            stmt2.setInt(2, latest_dash + 1);
+            stmt2.setInt(2, latest_dash);
             stmt2.setInt(3, heart_rate);
             stmt2.setString(4, gender);
             stmt2.setInt(5, weight_val);
@@ -415,7 +414,7 @@ public class Member {
                             "|                   Available PT slots                      |\n" +
                             "|___________________________________________________________|\n");
 
-        String available_slots = "SELECT first_name, last_name, trainer_id, win_date, start_time, end_time FROM trainer t RIGHT JOIN availability_window a ON t.trainer_id = a.trainer_id";
+        String available_slots = "SELECT first_name, last_name, trainer_id, win_date, start_time, end_time FROM trainer JOIN availability_window USING (trainer_id)";
         try (PreparedStatement stmt1 = conn.prepareStatement(available_slots, Statement.RETURN_GENERATED_KEYS)) {
             ResultSet rs = stmt1.executeQuery();
 
@@ -457,28 +456,48 @@ public class Member {
                     break;
             }
         }
-        System.out.print(   "|___________________________________________________________|\n" +
-                            "|                   Enter desired trainer id                |\n" +
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                 Enter PT session details!                 |\n" +
+                            "|                                                           |\n" +
+                            "|                       [ trainer_id ]                      |\n" +
+                            "|___________________________________________________________|\n" +
                             "| : ");
         int trainer_id = sc.nextInt();
         sc.nextLine();
 
-        System.out.print(   "|___________________________________________________________|\n" +
-                            "|                     Enter PT session date                 |\n" +
+
+        System.out.print(   "|                           date                            |\n" +
+                            "|                      [ YYYY-MM-DD ]                       |\n" +
+                            "|___________________________________________________________|\n" +
                             "| : ");
         String session_date = sc.nextLine();
 
-        System.out.print(   "|___________________________________________________________|\n" +
-                            "|                  Enter PT session start time              |\n" +
+        System.out.print(   "|                        start time                         |\n" +
+                            "|                         [ HH:MI ]                         |\n" +
+                            "|___________________________________________________________|\n" +
                             "| : ");
         String start_time = sc.nextLine();
 
-        System.out.print(   "|___________________________________________________________|\n" +
-                            "|                    Enter PT session end time              |\n" +
+        System.out.print(   "|                          end time                         |\n" +
+                            "|                         [ HH:MI ]                         |\n" +
+                            "|___________________________________________________________|\n" +
                             "| : ");
         String end_time = sc.nextLine();
 
-        
-        try (PreparedStatement stmt = conn.prepareStatement())
+        // This causes a trigger on the trainer database to remove the selected availability slot
+        String book_session = "INSERT INTO session (trainer_id, member_id, room_id, sess_date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(book_session)) {
+            stmt.setInt(1, trainer_id);
+            stmt.setInt(2, member_id);
+            stmt.setNull(3, Types.INTEGER); // assuming room_id is nullable
+            stmt.setDate(4, Date.valueOf(session_date));
+            stmt.setTime(5, Time.valueOf(start_time + ":00"));
+            stmt.setTime(6, Time.valueOf(end_time + ":00"));
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
