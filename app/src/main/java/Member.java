@@ -8,6 +8,7 @@ public class Member {
     private String email;
     private String first_name;
     private String last_name;
+    private int latest_dash;
 
     public Member(Connection conn, Scanner sc) {
         this.conn = conn;
@@ -89,6 +90,8 @@ public class Member {
 
         }
 
+        latest_dashboard();
+
         member_loop();
     }
     public boolean validate_email(String email){
@@ -113,6 +116,23 @@ public class Member {
 
            return false;
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void latest_dashboard() {
+        String get_dash = "SELECT entry_num FROM member_fitness WHERE member_id = ? ORDER BY entry_num DESC LIMIT 1";
+
+        try (PreparedStatement stmt = conn.prepareStatement(get_dash)) {
+            stmt.setInt(1,  member_id);
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()){
+                this.latest_dash = rs.getInt(1);
+
+                rs.close();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -181,6 +201,7 @@ public class Member {
                             "|___________________________________________________________|\n" +
                             "| : ");
         int body_fat = sc.nextInt();
+        sc.nextLine();
 
         String insertmember = "INSERT INTO member (email, first_name, last_name) VALUES (?, ?, ?)";
         try (PreparedStatement stmt1 = conn.prepareStatement(insertmember, Statement.RETURN_GENERATED_KEYS)) {
@@ -287,7 +308,6 @@ public class Member {
 
             rs.close();
 
-            return;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -295,7 +315,96 @@ public class Member {
 
     // view/modify dashboard
     public void dashboard(){
+        boolean loop = true;
+        String input;
 
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                 Welcome to your dashboard!                |\n" +
+                            "|___________________________________________________________|\n");
+
+        String fetch_dashboard = "SELECT heart_rate, gender, weight_val, body_fat, goal FROM member_fitness WHERE member_id = ? ORDER BY entry_num DESC LIMIT 1";
+        try (PreparedStatement stmt1 = conn.prepareStatement(fetch_dashboard, Statement.RETURN_GENERATED_KEYS)) {
+            stmt1.setInt(1, member_id);
+            ResultSet rs = stmt1.executeQuery();
+
+            if (rs.next()) {
+                System.out.print("| heart rate: "  + rs.getString(1) + "\n");
+                System.out.print("| gender: "  + rs.getString(2) + "\n");
+                System.out.print("| weight: "  + rs.getString(3) + "\n");
+                System.out.print("| body_fat: "  + rs.getString(4) + "\n");
+                System.out.print("| goal : "  + rs.getString(5) + "\n");
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.print(
+                            "|___________________________________________________________|\n" +
+                            "|                  OPTIONS (case sensitive)                 |\n" +
+                            "|                     [ update | exit ]                     |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        while(loop){
+            input = sc.nextLine();
+
+            switch (input) {
+                case "exit":
+                    return;
+                case "update":
+                    loop = false;
+                    break;
+                default:
+                    System.out.print("| Invalid input. Please try again\n| : ");
+                    break;
+            }
+        }
+
+        System.out.print(   "|                       [ heart rate ]                      |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int heart_rate = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                         [ gender ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String gender = sc.nextLine();
+
+        System.out.print(   "|                         [ weight ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int weight_val = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                        [ body fat ]                       |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int body_fat = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                          [ goal ]                         |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String goal = sc.nextLine();
+
+        String update_info = "INSERT INTO member_fitness (member_id, entry_num, heart_rate, gender, weight_val, body_fat, goal) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt2 = conn.prepareStatement(update_info)) {
+            stmt2.setInt(1, member_id);
+            stmt2.setInt(2, latest_dash + 1);
+            stmt2.setInt(3, heart_rate);
+            stmt2.setString(4, gender);
+            stmt2.setInt(5, weight_val);
+            stmt2.setInt(6, body_fat);
+            stmt2.setString(7, goal);
+
+            stmt2.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // register for PT session
