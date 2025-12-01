@@ -58,8 +58,13 @@ public class Member {
                 this.member_id = rs.getInt(1);
                 this.first_name = rs.getString(2);
                 this.last_name = rs.getString(3);
+                rs.close();
+                stmt.close();
                 return true;
            }
+
+           rs.close();
+           stmt.close();
 
            return false;
 
@@ -70,6 +75,101 @@ public class Member {
 
     // register new member
     public void register(){
+        boolean loop = true;
+        String input;
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|               Welcome to member registration!             |\n" +
+                            "|                                                           |\n" +
+                            "|                           OPTIONS                         |\n" +
+                            "|                     [ register | exit ]                   |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        while (loop) {
+            input = sc.nextLine();
+
+            if (input.equals("exit")) {
+                return;
+            } else if (input.equals("register")) {
+                loop = false;
+            } else {
+                System.out.print("| Invalid input. Please try again\n| : ");
+            }
+        }
+
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                  Enter information panel!                 |\n" +
+                            "|                                                           |\n" +
+                            "|                          [ email ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        String email = sc.nextLine();
+
+        System.out.print(   "|                        [ first name ]                     |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String first_name = sc.nextLine();
+
+        System.out.print(   "|                        [ last name ]                      |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String last_name  = sc.nextLine();
+
+        System.out.print(   "|                       [ heart rate ]                      |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int heart_rate = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                         [ gender ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String gender = sc.nextLine();
+
+        System.out.print(   "|                         [ weight ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int weight_val = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                        [ body fat ]                       |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int body_fat = sc.nextInt();
+
+        String insertmember = "INSERT INTO member (email, first_name, last_name) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt1 = conn.prepareStatement(insertmember, Statement.RETURN_GENERATED_KEYS)) {
+            stmt1.setString(1, email);
+            stmt1.setString(2, first_name);
+            stmt1.setString(3, last_name);
+            stmt1.executeUpdate();
+
+            ResultSet rs = stmt1.getGeneratedKeys();
+            if (rs.next()) {
+                this.member_id = rs.getInt(2);
+                this.first_name = rs.getString(3);
+                this.last_name = rs.getString(4);
+            }
+            rs.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        String insertfitness = "INSERT INTO member_fitness (member_id, entry_num, heart_rate, gender, weight_val, body_fat)" +
+                             "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt2 = conn.prepareStatement(insertfitness)) {
+            stmt2.setInt(1, member_id);
+            stmt2.setInt(2, 1);
+            stmt2.setInt(3, heart_rate);
+            stmt2.setString(4, gender);
+            stmt2.setInt(5, weight_val);
+            stmt2.setInt(6, body_fat);
+
+            stmt2.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         member_loop();
     }
