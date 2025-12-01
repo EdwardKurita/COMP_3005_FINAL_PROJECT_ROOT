@@ -409,6 +409,33 @@ public class Member {
 
     // register for PT session
     public void PT_session() {
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|            Welcome to the PT session scheduler!           |\n" +
+                            "|                                                           |\n" +
+                            "|                   Available PT slots                      |\n" +
+                            "|___________________________________________________________|\n");
+
+        String available_slots = "SELECT first_name, last_name, win_date, start_time, end_time FROM trainer t RIGHT JOIN availability_window a ON t.trainer_id = a.trainer_id";
+        try (PreparedStatement stmt1 = conn.prepareStatement(available_slots, Statement.RETURN_GENERATED_KEYS)) {
+            ResultSet rs = stmt1.executeQuery();
+
+            if (!rs.isBeforeFirst()) {
+                System.out.print("| No available PT slots found. Please try again later.\n");
+                return;
+            }
+
+            while (rs.next()) {
+                System.out.print(   "| " + rs.getString(1) + " " + rs.getString(2) + "\n" +
+                                    "| " + rs.getDate(3) + " - " + rs.getTime(4) + " to " + rs.getTime(5) + "\n" +
+                                    "|___________________________________________________________|\n");
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // add pt session scheduling
 
     }
 }
