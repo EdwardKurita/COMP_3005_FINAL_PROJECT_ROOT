@@ -6,3 +6,5 @@ The program looks for a database called "comp_3005_final_project" on port 5433. 
 After the database is setup, run the DDL.sql file and DML.sql in the query tool in PGadmin. This will setup the tables and populate with fake data.
 
 Pull the app directory and open with intellij to run the program. No further setup is required. 
+
+Also sorry for code spaghetti I thought this was due on the 6th so I wrote it all today. Check the commits :_) 
