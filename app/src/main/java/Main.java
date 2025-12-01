@@ -4,6 +4,11 @@ import java.sql.DriverManager;
 
 public class Main {
     public static void main() {
+        Connection conn = getConnection();
+
+    }
+
+    public static Connection getConnection() {
         String url = "jdbc:postgresql://localhost:5433/comp_3005_final_project";
         String user = "postgres";
         String password = "password";
@@ -17,7 +22,24 @@ public class Main {
                 System.out.println("Failed to connect to the database");
             }
 
+            return connection;
         } catch (Exception e) {
+            System.out.println("Failed to connect to the database");
         }
+
+        return null;
     }
+
+    // login function (login as member/trainer/admin or register)
+
+
+    // member functions
+
+    // register
+
+
+    // trainer function
+
+
+    // admin function
 }
