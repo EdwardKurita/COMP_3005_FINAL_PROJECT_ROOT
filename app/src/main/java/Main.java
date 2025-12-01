@@ -41,6 +41,8 @@ public class Main {
         Trainer trainer = new Trainer(conn, sc);
         Admin admin = new Admin(conn, sc);
 
+
+
         while (loop) {
             System.out.print(   ",___________________________________________________________,\n" +
                                 "|             Welcome to Health and Fitness tool!           |\n" +

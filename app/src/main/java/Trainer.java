@@ -205,7 +205,7 @@ public class Trainer {
             }
         }
 
-        String fetch_members = "SELECT member_id, first_name, last_name FROM member_fitness_dashboard";
+        String fetch_members = "SELECT DISTINCT member_id, first_name, last_name FROM member_fitness_dashboard ORDER BY member_id";
         try (PreparedStatement stmt1 = conn.prepareStatement(fetch_members)) {
             ResultSet rs = stmt1.executeQuery();
 
@@ -238,7 +238,7 @@ public class Trainer {
             ResultSet rs = stmt2.executeQuery();
 
             System.out.println(     ",___________________________________________________________,\n" +
-                                    "|                      Member                |\n" +
+                                    "|                          Member                           |\n" +
                                     "|___________________________________________________________|");
             while (rs.next()) {
                 System.out.print(   "| Heart Rate: " + rs.getInt(1) + " bpm\n" +

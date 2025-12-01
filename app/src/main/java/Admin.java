@@ -138,31 +138,74 @@ public class Admin {
             }
         }
 
-        String sessions = "SELECT session_id FROM session WHERE room_id IS NULL";
-        try (PreparedStatement stmt = conn.prepareStatement(sessions)) {
-            ResultSet rs = stmt.executeQuery();
+        String sessions = "SELECT session_id, room_id, sess_date, start_time, end_time FROM session";
+        try (PreparedStatement stmt1 = conn.prepareStatement(sessions)) {
+            ResultSet rs = stmt1.executeQuery();
 
-            System.out.print(",___________________________________________________________,\n" +
-                    "|                     Available Room Sessions               |\n" +
-                    "|___________________________________________________________|\n" +
-                    "|  Session ID  |          Date          |   Time Slot      |\n" +
-                    "|___________________________________________________________|\n");
+            System.out.print(   ",___________________________________________________________,\n" +
+                                "|                     Available Room Sessions               |\n" +
+                                "|___________________________________________________________|\n");
 
             while (rs.next()) {
-                int session_id = rs.getInt("session_id");
+                int session_id = rs.getInt(1);
 
-                //System.out.print("|      |       YYYY-MM-DD       |    HH:MI - HH:MI  |\n", session_id);
+                System.out.print(   "| ID: " +  rs.getInt(1) + " | ROOM: " + rs.getInt(2) + "\n" +
+                                    "| Date: " + rs.getDate(3) + " | " + rs.getTime(4) + " - " + rs.getTime(5) + "\n" +
+                                    "|___________________________________________________________|\n");
             }
-
-            System.out.print("|___________________________________________________________|\n");
 
             rs.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-
+            throw new RuntimeException(e);
         }
 
-        // equipment management
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                          Assign Room                      |\n" +
+                            "|                                                           |\n" +
+                            "|                           OPTIONS                         |\n" +
+                            "|                      [ assign | exit ]                    |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        loop = true;
+
+        while (loop) {
+            input = sc.nextLine();
+
+            switch (input) {
+                case "assign":
+                    loop = false;
+                    break;
+                case "exit":
+                    return;
+                default:
+                    System.out.print("| Invalid input. Please try again.\n| : ");
+                    break;
+            }
+        }
+
+        System.out.print(   "|                         [ ROOM ]                          |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int room_id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print(   "|                          [ ID ]                           |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        String assign_room = "UPDATE session SET room_id = ? WHERE session_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(assign_room)) {
+            stmt.setInt(1, room_id);
+            stmt.setInt(2, id);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
