@@ -3,8 +3,13 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 
 public class Main {
+    // main main loop
     public static void main() {
         Connection conn = getConnection();
+
+        if (conn != null) {
+            // call login if successful
+        }
 
     }
 
@@ -16,11 +21,8 @@ public class Main {
         try {
             Class.forName("org.postgresql.Driver");
             Connection connection = DriverManager.getConnection(url, user, password);
-            if (connection != null) {
-                System.out.println("Connected to the database");
-            } else {
-                System.out.println("Failed to connect to the database");
-            }
+
+            System.out.println("Connected to the database");
 
             return connection;
         } catch (Exception e) {
@@ -30,16 +32,6 @@ public class Main {
         return null;
     }
 
-    // login function (login as member/trainer/admin or register)
+    // login function (login as member/trainer/admin or register) also creates a new admin/member/trainer class on switch
 
-
-    // member functions
-
-    // register
-
-
-    // trainer function
-
-
-    // admin function
 }
