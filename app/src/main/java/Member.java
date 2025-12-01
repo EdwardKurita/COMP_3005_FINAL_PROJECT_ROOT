@@ -5,6 +5,7 @@ public class Member {
     public Connection conn;
     private final Scanner sc;
     private int member_id;
+    private String email;
     private String first_name;
     private String last_name;
 
@@ -14,9 +15,50 @@ public class Member {
     }
 
     // default member loop
-    public void member_loop(){
-        System.out.println("welcome to member centre\n");
+    public void member_loop() {
+        String input = "";
+        while (true) {
+            System.out.print(   ",___________________________________________________________,\n" +
+                                "|                    Welcome to member home!                |\n" +
+                                "|                                                           |\n" +
+                                "|                  OPTIONS (case sensitive)                 |\n" +
+                                "|        [ ptsession | profile | dashboard | exit ]         |\n" +
+                                "|___________________________________________________________|\n" +
+                                "| : ");
 
+            boolean inner_loop = true;
+
+            while (inner_loop) {
+                input = sc.nextLine();
+
+                switch (input) {
+                    case "ptsession", "profile", "dashboard", "exit":
+                        inner_loop = false;
+                        break;
+                    default:
+                        System.out.print("| Invalid input. Please try again\n| : ");
+                        break;
+                }
+            }
+
+            switch (input) {
+                case "ptsession":
+                    PT_session();
+                    break;
+                case "profile":
+                    profile();
+                    break;
+                case "dashboard":
+                    dashboard();
+                    break;
+                case "exit":
+                    return;
+                default:
+                    System.out.println("| Input handling issue.");
+                    break;
+            }
+
+        }
     }
 
     // login as member (logout to exit)
@@ -60,6 +102,9 @@ public class Member {
                 this.last_name = rs.getString(3);
                 rs.close();
                 stmt.close();
+
+                this.email = email;
+
                 return true;
            }
 
@@ -176,7 +221,76 @@ public class Member {
 
     // profile management
     public void profile(){
+        boolean loop = true;
+        String input;
 
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                   Welcome to your profile!                |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| " + this.email + "\n" +
+                            "| " + this.first_name + "\n" +
+                            "| " + this.last_name + "\n" +
+                            "|___________________________________________________________|\n" +
+                            "|                  OPTIONS (case sensitive)                 |\n" +
+                            "|                     [ update | exit ]                     |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+
+        while(loop){
+            input = sc.nextLine();
+
+            switch (input) {
+                case "exit":
+                    return;
+                case "update":
+                    loop = false;
+                    break;
+                default:
+                    System.out.print("| Invalid input. Please try again\n| : ");
+                    break;
+            }
+        }
+
+        System.out.print(   ",___________________________________________________________,\n" +
+                            "|                  Enter information panel!                 |\n" +
+                            "|                                                           |\n" +
+                            "|                          [ email ]                        |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String email = sc.nextLine();
+
+        System.out.print(   "|                        [ first name ]                     |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String first_name = sc.nextLine();
+
+        System.out.print(   "|                        [ last name ]                      |\n" +
+                            "|___________________________________________________________|\n" +
+                            "| : ");
+        String last_name  = sc.nextLine();
+
+        String update_info = "UPDATE member SET first_name = ?, last_name = ?, email = ? WHERE member_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(update_info, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, first_name);
+            stmt.setString(2, last_name);
+            stmt.setString(3, email);
+            stmt.setInt(4, member_id);
+            stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                this.email = rs.getString(1);
+                this.member_id = rs.getInt(2);
+                this.first_name = rs.getString(3);
+                this.last_name = rs.getString(4);
+            }
+
+            rs.close();
+
+            return;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // view/modify dashboard
